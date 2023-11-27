@@ -54,6 +54,7 @@ function App() {
       <div className="banner banner-image"></div>
 
       <div className="menu">
+        <button className="hamburger" onClick={() => handleFilterChange('All')}>☰</button>
         <button onClick={() => handleFilterChange('All')}>All</button>
         <button onClick={() => handleFilterChange('Current')}>Current</button>
         <button onClick={() => handleFilterChange('Completed')}>Completed</button>
@@ -61,6 +62,7 @@ function App() {
         <button onClick={() => handleFilterChange('Dropped')}>Dropped</button>
         <button onClick={() => handleFilterChange('Planned')}>Planned</button>
       </div>
+
 
       {loading ? (
         <div className="loading">
@@ -77,13 +79,13 @@ function App() {
 
               return (
                 <div>
-                <li key={item.id} className="list-item" style={backgroundStyle}>
-                 <div className="text">
-                    <p className="title">{item.title}</p>
-                    <p className="score">{item.score}</p>
-                    <p className="episodes">{`${item.episodes}Ep`}</p>
-                  </div> 
-                </li>
+                  <li key={item.id} className="list-item" style={backgroundStyle}>
+                    <div className="text">
+                      <p className="title">{item.title}</p>
+                      <p className="score">{item.score}</p>
+                      <p className="episodes">{`${item.episodes}Ep`}</p>
+                    </div>
+                  </li>
                 </div>
               );
             }
