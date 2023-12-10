@@ -1,7 +1,10 @@
 // App.js
 
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import './App.css';
+import AnimeSearch from './Pages/AnimeSearch';
+import AnimeList from './Pages/AnimeList';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +61,6 @@ function App() {
   };
 
   return (
-
     <div className="App">
       <h1>AniList</h1>
       <div>

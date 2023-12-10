@@ -1,78 +1,17 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
+/* AnimeList.css */
+
+.SavedListPage {
+  text-align: center;
 }
 
-.text {
-  color: #f3f3f3;
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  font-weight: bold; 
-}
-
-#root {
-  height: 100%;
-}
-
-.banner-image {
-  background-image: url('Images/Banner.png');
-  background-size: cover;
-  background-position: center;
-}
-
-.banner {
-  height: 100px;
-  background-color: #3498db;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.menu {
-  height: 50px;
-  background-color: #444;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  padding: 10px;
-  width: 100px;
-  margin: 0 10px;
-}
-
-.menu button:hover {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  background-color: rgb(129, 129, 129);
-  padding: 10px;
-  margin: 0 10px;
-  transition: 1s;
-}
-
-
-.list {
+.saved-anime-list {
+  margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  justify-content: space-around;
 }
 
-.list-item img {
-  max-width: 100%;
-  max-height: 50px;
-}
-
-.list-item {
+.saved-anime-item {
   position: relative;
   width: 210px;
   height: 300px;
@@ -86,27 +25,35 @@ body, html {
   text-align: center;
   overflow: hidden;
   padding: 5px;
-  transition: transform 0.4s;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.8);
+  transition: transform 0.4s, filter 0.4s;
 }
 
-.score {
-  position: absolute;
-  bottom: 5px; 
-  left: 5px; 
-  font-size: 14px;
+.saved-anime-item:hover {
+  transform: scale(1.1);
+  filter: brightness(0.4);
 }
 
-.episodes {
-  position: absolute;
-  bottom: 5px; 
-  right: 5px; 
-  font-size: 14px;
+.saved-anime-item:hover .title,
+.saved-anime-item:hover .episodes,
+.saved-anime-item:hover .status {
+  filter: brightness(1); /* Full brightness for text elements on hover */
 }
 
-.list-item:hover {
-  filter: blur(1px);
-  transform: scale(1.05);
-  transition: transform 0.4s; 
+.title,
+.episodes,
+.status {
+  display: none;
+  color: #fff;
+}
+
+.saved-anime-item:hover .title,
+.saved-anime-item:hover .episodes,
+.saved-anime-item:hover .status {
+  display: block;
+  transition: display 0.4s ease-in-out;
 }
 
 .title {
@@ -116,41 +63,116 @@ body, html {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  max-width: 90%; 
-  padding: 5px; 
+  max-width: 90%;
+  padding: 5px;
+  font-weight: bold;
 }
 
-.episodes {
-  font-size: 14px; 
-  align-self: flex-end; 
+.episodes,
+.status {
+  font-size: 14px;
+  margin: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 90%;
+  padding: 5px;
+  font-weight: bold;
 }
 
-.loading {
+.status {
+  color: #f39c12; /* Set a color for the status */
+}
+
+.bottom-left-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: red; /* Set the color to red */
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: rgba(255, 255, 255, 0.8);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  color: white; /* Set text color to white */
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 2s linear infinite;
+.saved-anime-item:hover .bottom-left-button {
+  opacity: 1;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.dropdown {
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  opacity: 0;
+  
+}
+
+.saved-anime-item:hover .dropdown {
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.Banner {
+  position: relative;
+  background-color: #1e2225;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  background-size: cover; /* Add this line to make the image cover the entire banner */
+  background-position: center; /* Add this line to center the image */
+}
+
+.top-right-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  background-image: url('../Images/ImageAdd.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.menu {
+  display: flex;
+  justify-content: space-around;
+  background-color: #333;
+  padding: 10px;
+}
+
+.menu button {
+  background-color: #555;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.menu button:hover {
+  background-color: #777; /* Hover background color */
 }
 
 
 
+
+@media (max-width: 600px) {
+  .saved-anime-item {
+    width: 310px; /* Set the width to 100% for smaller screens */
+    height: 450px;
+    margin-bottom: 30px;
+  }
+}

@@ -1,7 +1,5 @@
-// App.js
-
 import React, { useState } from 'react';
-import './App.css';
+import './AnimeSearch.css';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,34 +7,28 @@ function App() {
   const [savedAnime, setSavedAnime] = useState(JSON.parse(localStorage.getItem('SavedAnime')) || []);
 
   const isSaved = (item) => {
-    // Retrieve the existing saved anime from local storage
     const savedAnime = JSON.parse(localStorage.getItem('SavedAnime')) || [];
 
-    // Check if the anime is already saved based on mal_id
     return savedAnime.some((savedItem) => savedItem.mal_id === item.mal_id);
   };
 
   const handleSaveToLocalStorage = (item) => {
-    // Check if the anime is already saved based on mal_id
     const isAlreadySaved = savedAnime.some((savedItem) => savedItem.mal_id === item.mal_id);
 
     if (!isAlreadySaved) {
-      // Add the anime to the saved list
       const updatedAnime = [...savedAnime, item];
+
       setSavedAnime(updatedAnime);
 
-      // Save the updated list to local storage
       localStorage.setItem('SavedAnime', JSON.stringify(updatedAnime));
 
       console.log(`Saved "${item.title}" to local storage.`);
+
     } else {
-      // Remove the anime from the saved list
       const updatedAnimeList = savedAnime.filter((savedItem) => savedItem.mal_id !== item.mal_id);
       setSavedAnime(updatedAnimeList);
 
-      // Save the updated list to local storage
       localStorage.setItem('SavedAnime', JSON.stringify(updatedAnimeList));
-
       console.log(`Removed "${item.title}" from local storage.`);
     }
   };
@@ -79,12 +71,10 @@ function App() {
               <h2 className="title">{item.title}</h2>
               <p className="episodes">Episodes: {item.episodes}</p>
 
-              {/* Button on the bottom left (initially hidden) */}
               <button className="bottom-left-button" onClick={() => handleSaveToLocalStorage(item)}>
                 Save
               </button>
 
-              {/* Saved badge */}
               {isSaved(item) && <div className="saved-badge">Saved</div>}
             </div>
           ))}
