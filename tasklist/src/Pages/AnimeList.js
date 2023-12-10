@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [filter, setFilter] = useState('All');
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
@@ -17,7 +18,7 @@ function App() {
 
       const itemPromises = itemIds.map(async (itemId, index) => {
         if (index % maxConcurrentRequests === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 40));
         }
 
         try {
@@ -27,7 +28,7 @@ function App() {
             const itemData = {
               id: data.data.mal_id,
               title: data.data.title,
-              status: 'Current',
+              status: '',
               imageUrl: data.data.images.jpg,
               score: 'None',
               episodes: data.data.episodes,
@@ -42,6 +43,7 @@ function App() {
 
       const itemData = (await Promise.all(itemPromises)).filter((item) => item !== null);
       setItems(itemData);
+      setLoading(false);
     };
 
     fetchDataWithRateLimit();
@@ -49,8 +51,7 @@ function App() {
 
   return (
     <div>
-      <div className="banner banner-image">
-      </div>
+      <div className="banner banner-image"></div>
 
       <div className="menu">
         <button onClick={() => handleFilterChange('All')}>All</button>
@@ -61,26 +62,35 @@ function App() {
         <button onClick={() => handleFilterChange('Planned')}>Planned</button>
       </div>
 
-      <ul className="list">
-        {items.map((item) => {
-          if (filter === 'All' || filter === item.status) {
-            const backgroundStyle = {
-              backgroundImage: `url(${item.imageUrl})`,
-            };
+      {loading ? (
+        <div className="loading">
+          <div className="loader"></div>
+          <p>Loading...</p>
+        </div>
+      ) : (
+        <ul className="list">
+          {items.map((item) => {
+            if (filter === 'All' || filter === item.status) {
+              const backgroundStyle = {
+                backgroundImage: `url(${item.imageUrl.image_url})`,
+              };
 
-            return (
-              <li key={item.id} className="list-item" style={backgroundStyle}>
-                <div className="text">
-                  <p className="title">{item.title}</p>
-                  <p className="score">{item.score}</p>
-                  <p className="episodes">{`${item.episodes}Ep`}</p>
+              return (
+                <div>
+                <li key={item.id} className="list-item" style={backgroundStyle}>
+                 <div className="text">
+                    <p className="title">{item.title}</p>
+                    <p className="score">{item.score}</p>
+                    <p className="episodes">{`${item.episodes}Ep`}</p>
+                  </div> 
+                </li>
                 </div>
-              </li>
-            );
-          }
-          return null;
-        })}
-      </ul>
+              );
+            }
+            return null;
+          })}
+        </ul>
+      )}
     </div>
   );
 }
