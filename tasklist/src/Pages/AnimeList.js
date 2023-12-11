@@ -65,7 +65,7 @@ function AnimeList() {
     console.log(`Changed status to "${selectedOption}" for anime "${item.title}"`);
   };
 
-  
+
 
   useEffect(() => {
     const savedAnimeData = JSON.parse(localStorage.getItem('SavedAnime')) || [];
@@ -87,6 +87,7 @@ function AnimeList() {
         />
       </div>
       <div className="menu">
+        <button onClick={() => setFilterStatus('☰')}>☰</button>
         <button onClick={() => setFilterStatus('All')}>All</button>
         <button onClick={() => setFilterStatus('Current')}>Current</button>
         <button onClick={() => setFilterStatus('Completed')}>Completed</button>
