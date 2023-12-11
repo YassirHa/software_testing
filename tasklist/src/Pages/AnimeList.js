@@ -1,88 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+// AnimeList.js
 
-function App() {
-  const [filter, setFilter] = useState('All');
-  const [items, setItems] = useState([]);
+import React, { useState, useEffect, useRef } from 'react';
+import './AnimeList.css';
 
-  const handleFilterChange = (newFilter) => {
-    setFilter(newFilter);
+function AnimeList() {
+  const [savedAnime, setSavedAnime] = useState([]);
+  const [bannerImage, setBannerImage] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('All');
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBannerImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleSaveToLocalStorage = (item) => {
+    const isAlreadySaved = savedAnime.some((savedItem) => savedItem.mal_id === item.mal_id);
+
+    if (!isAlreadySaved) {
+      const updatedAnime = [...savedAnime, item];
+      setSavedAnime(updatedAnime);
+
+      localStorage.setItem('SavedAnime', JSON.stringify(updatedAnime));
+
+      console.log(`Saved "${item.title}" to local storage.`);
+    } else {
+      // Ask for confirmation before removing
+      const shouldRemove = window.confirm(`Are you sure you want to remove "${item.title}" from local storage?`);
+
+      if (shouldRemove) {
+        const updatedAnimeList = savedAnime.filter((savedItem) => savedItem.mal_id !== item.mal_id);
+        setSavedAnime(updatedAnimeList);
+
+        localStorage.setItem('SavedAnime', JSON.stringify(updatedAnimeList));
+
+        console.log(`Removed "${item.title}" from local storage.`);
+      }
+    }
+  };
+
+  const handleDropdownChange = (e, item) => {
+    const selectedOption = e.target.value;
+
+    // Update the status of the anime item in local state
+    const updatedAnimeList = savedAnime.map((anime) =>
+      anime.mal_id === item.mal_id ? { ...anime, status: selectedOption } : anime
+    );
+
+    setSavedAnime(updatedAnimeList);
+
+    // Update the status in local storage
+    localStorage.setItem('SavedAnime', JSON.stringify(updatedAnimeList));
+
+    console.log(`Changed status to "${selectedOption}" for anime "${item.title}"`);
+  };
+
+
+
   useEffect(() => {
-    const fetchDataWithRateLimit = async () => {
-      const itemIds = Array.from({ length: 20 }, (_, index) => index + 1);
-
-      const maxConcurrentRequests = 5;
-
-      const itemPromises = itemIds.map(async (itemId, index) => {
-        if (index % maxConcurrentRequests === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-
-        try {
-          const response = await fetch(`https://api.jikan.moe/v4/anime/${itemId}`);
-          const data = await response.json();
-          if (data.data && data.data.mal_id) {
-            const itemData = {
-              id: data.data.mal_id,
-              title: data.data.title,
-              status: 'Current',
-              imageUrl: data.data.images.jpg,
-              score: 'None',
-              episodes: data.data.episodes,
-            };
-            return itemData;
-          }
-        } catch (error) {
-          console.error('Error fetching data for item', itemId, error);
-        }
-        return null;
-      });
-
-      const itemData = (await Promise.all(itemPromises)).filter((item) => item !== null);
-      setItems(itemData);
-    };
-
-    fetchDataWithRateLimit();
+    const savedAnimeData = JSON.parse(localStorage.getItem('SavedAnime')) || [];
+    setSavedAnime(savedAnimeData);
   }, []);
 
   return (
-    <div>
-      <div className="banner banner-image">
+    <div className="SavedListPage">
+      <div className="Banner" style={{ backgroundImage: `url(${bannerImage})` }}>
+        <h1>Welcome to Your Anime List</h1>
+        <p>Keep track of your favorite anime here!</p>
+        <button className="top-right-button" onClick={handleButtonClick}></button>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleImageChange}
+        />
       </div>
-
       <div className="menu">
-        <button onClick={() => handleFilterChange('All')}>All</button>
-        <button onClick={() => handleFilterChange('Current')}>Current</button>
-        <button onClick={() => handleFilterChange('Completed')}>Completed</button>
-        <button onClick={() => handleFilterChange('Paused')}>Paused</button>
-        <button onClick={() => handleFilterChange('Dropped')}>Dropped</button>
-        <button onClick={() => handleFilterChange('Planned')}>Planned</button>
+        <button onClick={() => setFilterStatus('☰')}>☰</button>
+        <button onClick={() => setFilterStatus('All')}>All</button>
+        <button onClick={() => setFilterStatus('Current')}>Current</button>
+        <button onClick={() => setFilterStatus('Completed')}>Completed</button>
+        <button onClick={() => setFilterStatus('Paused')}>Paused</button>
+        <button onClick={() => setFilterStatus('Dropped')}>Dropped</button>
+        <button onClick={() => setFilterStatus('Planned')}>Planned</button>
       </div>
+      <h1>Saved Anime List</h1>
 
-      <ul className="list">
-        {items.map((item) => {
-          if (filter === 'All' || filter === item.status) {
-            const backgroundStyle = {
-              backgroundImage: `url(${item.imageUrl})`,
-            };
+      <div className="saved-anime-list">
+        {savedAnime
+          .filter((item) => filterStatus === 'All' || item.status === filterStatus) // Apply the filter
+          .map((item, index) => (
+            <div
+              key={index}
+              className="saved-anime-item"
+              style={{ backgroundImage: `url(${item.images.jpg.large_image_url || ''})` }}
+            >
+              <h2 className="title">{item.title}</h2>
+              <p className="episodes">Episodes: {item.episodes}</p>
 
-            return (
-              <li key={item.id} className="list-item" style={backgroundStyle}>
-                <div className="text">
-                  <p className="title">{item.title}</p>
-                  <p className="score">{item.score}</p>
-                  <p className="episodes">{`${item.episodes}Ep`}</p>
-                </div>
-              </li>
-            );
-          }
-          return null;
-        })}
-      </ul>
+              <button className="bottom-left-button" onClick={() => handleSaveToLocalStorage(item)}>
+                Save
+              </button>
+              <select className="dropdown" onChange={(e) => handleDropdownChange(e, item)}>
+                <option value="All">All</option>
+                <option value="Current">Current</option>
+                <option value="Completed">Completed</option>
+                <option value="Paused">Paused</option>
+                <option value="Dropped">Dropped</option>
+                <option value="Planned">Planned</option>
+              </select>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
 
-export default App;
+export default AnimeList;

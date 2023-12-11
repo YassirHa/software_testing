@@ -1,97 +1,96 @@
-import React, { useState, useEffect } from 'react';
+// App.js
+
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import './App.css';
+import AnimeSearch from './Pages/AnimeSearch';
+import AnimeList from './Pages/AnimeList';
 
 function App() {
-  const [filter, setFilter] = useState('All');
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [animeData, setAnimeData] = useState(null);
+  const [savedAnime, setSavedAnime] = useState(JSON.parse(localStorage.getItem('SavedAnime')) || []);
 
-  const handleFilterChange = (newFilter) => {
-    setFilter(newFilter);
+  const isSaved = (item) => {
+    // Retrieve the existing saved anime from local storage
+    const savedAnime = JSON.parse(localStorage.getItem('SavedAnime')) || [];
+
+    // Check if the anime is already saved based on mal_id
+    return savedAnime.some((savedItem) => savedItem.mal_id === item.mal_id);
   };
 
-  useEffect(() => {
-    const fetchDataWithRateLimit = async () => {
-      const itemIds = Array.from({ length: 20 }, (_, index) => index + 1);
+  const handleSaveToLocalStorage = (item) => {
+    // Check if the anime is already saved based on mal_id
+    const isAlreadySaved = savedAnime.some((savedItem) => savedItem.mal_id === item.mal_id);
 
-      const maxConcurrentRequests = 5;
+    if (!isAlreadySaved) {
+      // Add the anime to the saved list
+      const updatedAnime = [...savedAnime, item];
+      setSavedAnime(updatedAnime);
 
-      const itemPromises = itemIds.map(async (itemId, index) => {
-        if (index % maxConcurrentRequests === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 4000));
-        }
+      // Save the updated list to local storage
+      localStorage.setItem('SavedAnime', JSON.stringify(updatedAnime));
 
-        try {
-          const response = await fetch(`https://api.jikan.moe/v4/anime/${itemId}`);
-          const data = await response.json();
-          if (data.data && data.data.mal_id) {
-            const itemData = {
-              id: data.data.mal_id,
-              title: data.data.title,
-              status: '',
-              imageUrl: data.data.images.jpg,
-              score: 'None',
-              episodes: data.data.episodes,
-            };
-            return itemData;
-          }
-        } catch (error) {
-          console.error('Error fetching data for item', itemId, error);
-        }
-        return null;
-      });
+      console.log(`Saved "${item.title}" to local storage.`);
+    } else {
+      // Remove the anime from the saved list
+      const updatedAnimeList = savedAnime.filter((savedItem) => savedItem.mal_id !== item.mal_id);
+      setSavedAnime(updatedAnimeList);
 
-      const itemData = (await Promise.all(itemPromises)).filter((item) => item !== null);
-      setItems(itemData);
-      setLoading(false);
-    };
+      // Save the updated list to local storage
+      localStorage.setItem('SavedAnime', JSON.stringify(updatedAnimeList));
 
-    fetchDataWithRateLimit();
-  }, []);
+      console.log(`Removed "${item.title}" from local storage.`);
+    }
+  };
+  
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`https://api.jikan.moe/v4/anime?q=${searchQuery}&sfw`);
+      const data = await response.json();
+
+      if (data.data && data.data.length > 0) {
+        const first100Items = data.data.slice(0, 100);
+        setAnimeData(first100Items);
+      } else {
+        console.error('Data is not in the expected format or is empty:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   return (
-    <div>
-      <div className="banner banner-image"></div>
-
-      <div className="menu">
-        <button className="hamburger" onClick={() => handleFilterChange('All')}>☰</button>
-        <button onClick={() => handleFilterChange('All')}>All</button>
-        <button onClick={() => handleFilterChange('Current')}>Current</button>
-        <button onClick={() => handleFilterChange('Completed')}>Completed</button>
-        <button onClick={() => handleFilterChange('Paused')}>Paused</button>
-        <button onClick={() => handleFilterChange('Dropped')}>Dropped</button>
-        <button onClick={() => handleFilterChange('Planned')}>Planned</button>
+    <div className="App">
+      <h1>AniList</h1>
+      <div>
+        <input
+          type="text"
+          placeholder="Enter anime name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
       </div>
 
+      {/* Display anime data */}
+      {animeData && (
+        <div className="anime-list">
+          {animeData.map((item, index) => (
+            <div key={index} className={`anime-item ${isSaved(item) ? 'saved' : ''}`} style={{ backgroundImage: `url(${item.images?.jpg?.image_url})` }}>
+              <h2 className="title">{item.title}</h2>
+              <p className="episodes">Episodes: {item.episodes}</p>
 
-      {loading ? (
-        <div className="loading">
-          <div className="loader"></div>
-          <p>Loading...</p>
+              {/* Button on the bottom left (initially hidden) */}
+              <button className="bottom-left-button" onClick={() => handleSaveToLocalStorage(item)}>
+                Save
+              </button>
+
+              {/* Saved badge */}
+              {isSaved(item) && <div className="saved-badge">Saved</div>}
+            </div>
+          ))}
         </div>
-      ) : (
-        <ul className="list">
-          {items.map((item) => {
-            if (filter === 'All' || filter === item.status) {
-              const backgroundStyle = {
-                backgroundImage: `url(${item.imageUrl.image_url})`,
-              };
-
-              return (
-                <div>
-                  <li key={item.id} className="list-item" style={backgroundStyle}>
-                    <div className="text">
-                      <p className="title">{item.title}</p>
-                      <p className="score">{item.score}</p>
-                      <p className="episodes">{`${item.episodes}Ep`}</p>
-                    </div>
-                  </li>
-                </div>
-              );
-            }
-            return null;
-          })}
-        </ul>
       )}
     </div>
   );

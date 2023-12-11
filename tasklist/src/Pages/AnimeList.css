@@ -1,119 +1,181 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-  }
+/* AnimeList.css */
+
+.SavedListPage {
+  text-align: center;
+}
+
+.saved-anime-list {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  max-width: 90%;
+  margin: auto;
+}
+
+.saved-anime-item {
+  position: relative;
+  width: 210px;
+  height: 300px;
+  border-radius: 2%;
+  margin: 10px;
+  margin-right: 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  overflow: hidden;
+  padding: 5px;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.8);
+  transition: transform 0.4s, filter 0.4s;
+}
+
+.saved-anime-item:hover {
+  transform: scale(1.1);
+  filter: brightness(0.4);
+}
+
+.saved-anime-item:hover .title,
+.saved-anime-item:hover .episodes,
+.saved-anime-item:hover .status {
+  filter: brightness(1); /* Full brightness for text elements on hover */
+}
+
+.title,
+.episodes,
+.status {
+  display: none;
+  color: #fff;
+}
+
+.saved-anime-item:hover .title,
+.saved-anime-item:hover .episodes,
+.saved-anime-item:hover .status {
+  display: block;
+  transition: display 0.4s ease-in-out;
+}
+
+.title {
+  font-size: 16px;
+  margin: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 90%;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.episodes,
+.status {
+  font-size: 14px;
+  margin: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 90%;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.status {
+  color: #f39c12; /* Set a color for the status */
+}
+
+.bottom-left-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: red; /* Set the color to red */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; /* Set text color to white */
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.saved-anime-item:hover .bottom-left-button {
+  opacity: 1;
+}
+
+.dropdown {
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  opacity: 0;
   
-  #root {
-    height: 100%;
+}
+
+.saved-anime-item:hover .dropdown {
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.Banner {
+  position: relative;
+  background-color: #1e2225;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  background-size: cover; /* Add this line to make the image cover the entire banner */
+  background-position: center; /* Add this line to center the image */
+}
+
+.top-right-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  background-image: url('../Images/ImageAdd.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.menu {
+  display: flex;
+  justify-content: space-around;
+  background-color: #333;
+  padding: 10px;
+}
+
+.menu button {
+  background-color: #555;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.menu button:hover {
+  background-color: #777; /* Hover background color */
+}
+
+
+
+
+@media (max-width: 600px) {
+  .saved-anime-item {
+    width: 310px; /* Set the width to 100% for smaller screens */
+    height: 450px;
+    margin-bottom: 30px;
   }
-  
-  .banner-image {
-    background-image: url('Images/Banner.png');
-    background-size: cover;
-    background-position: center;
-  }
-  
-  .banner {
-    height: 100px;
-    background-color: #3498db;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .menu {
-    height: 50px;
-    background-color: #444;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .menu button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    padding: 10px;
-    width: 100px;
-    margin: 0 10px;
-  }
-  
-  .menu button:hover {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    background-color: rgb(129, 129, 129);
-    padding: 10px;
-    margin: 0 10px;
-    transition: 1s;
-  }
-  
-  
-  .list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .list-item img {
-    max-width: 100%;
-    max-height: 50px;
-  }
-  
-  .list-item {
-    position: relative;
-    width: 210px;
-    height: 300px;
-    border: 1px solid #ccc;
-    margin: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: center;
-    overflow: hidden;
-    padding: 5px;
-    transition: transform 0.4s;
-  }
-  
-  .score {
-    position: absolute;
-    bottom: 5px; 
-    left: 5px; 
-    font-size: 14px;
-  }
-  
-  .episodes {
-    position: absolute;
-    bottom: 5px; 
-    right: 5px; 
-    font-size: 14px;
-  }
-  
-  .list-item:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s; 
-  }
-  
-  .title {
-    font-size: 16px;
-    margin: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-    max-width: 90%; 
-    padding: 5px; 
-  }
-  
-  .episodes {
-    font-size: 14px; 
-    align-self: flex-end; 
-  }
+}
